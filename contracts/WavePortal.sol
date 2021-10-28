@@ -13,6 +13,8 @@ contract WavePortal {
 
     function wave() public {
         totalWaves += 1;
+
+        // This is the wallet address of the person who called the function
         console.log("%s has waved!", msg.sender);
     }
 
