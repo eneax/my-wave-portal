@@ -1,7 +1,4 @@
 const main = async () => {
-  // Get wallet address of contract owner
-  const [owner, randomPerson] = await hre.ethers.getSigners();
-
   // Compile smart contract
   const waveContractFactory = await hre.ethers.getContractFactory("WavePortal");
   // Deploy it to local blockchain
@@ -9,26 +6,22 @@ const main = async () => {
 
   // Wait for contract to be deployed
   await waveContract.deployed();
+  console.log("Contract address:", waveContract.address);
 
-  // Log contract address and contract owner address
-  console.log("Contract deployed to:", waveContract.address);
-  console.log("Contract deployed by:", owner.address);
-
-  // Manually call functions
   let waveCount;
   waveCount = await waveContract.getTotalWaves();
+  console.log(waveCount.toNumber());
 
-  // Owner waves
-  let waver = await waveContract.wave();
-  await waver.wait();
+  // send a few waves!
+  let waveTxn = await waveContract.wave("A message!");
+  await waveTxn.wait(); // Wait for the transaction to be mined
 
-  waveCount = await waveContract.getTotalWaves();
+  const [_, randomPerson] = await hre.ethers.getSigners();
+  waveTxn = await waveContract.connect(randomPerson).wave("Another message!");
+  await waveTxn.wait(); // Wait for the transaction to be mined
 
-  // Random person waves
-  waver = await waveContract.connect(randomPerson).wave();
-  await waver.wait();
-
-  waveCount = await waveContract.getTotalWaves();
+  let allWaves = await waveContract.getAllWaves();
+  console.log(allWaves);
 };
 
 const runMain = async () => {
